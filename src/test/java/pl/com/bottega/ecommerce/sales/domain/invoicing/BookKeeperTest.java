@@ -96,24 +96,24 @@ public class BookKeeperTest {
 	}
 
 	@Test
-	public final void testIssuance_testReult_invoiceShouldReturnProperClientData() {
-		ClientData clientData = new ClientData(Id.generate(), "not important");
-		Invoice invoice = new Invoice(Id.generate(), clientData);
-		InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
-		Money price = new Money(10);
-		ProductData productData = new ProductData(Id.generate(), price, "not important", ProductType.DRUG, new Date());
-		RequestItem item = new RequestItem(productData, 0, new Money(10));
-		invoiceRequest.add(item);
+	public final void testIssuance_testReult_invoiceShouldContainProperClientData() {
+		InvoiceRequest invoiceRequest = new InvoiceRequestBuilder().build();
+		RequestItem requestItem = new RequestItemBuilder().build();
+		invoiceRequest.add(requestItem);
 
-		InvoiceFactory invoiceFactory = Mockito.mock(InvoiceFactory.class);
-		TaxPolicy taxPolicy = Mockito.mock(TaxPolicy.class);
-		Mockito.when(invoiceFactory.create(invoiceRequest.getClientData())).thenReturn(invoice);
-		Mockito.when(taxPolicy.calculateTax(ProductType.DRUG, price)).thenReturn(
-				new Tax(new Money(1d), "not important"));
+		Invoice invoice = new InvoiceBuilder().withClient(invoiceRequest.getClient()).build();
+		Tax tax = new TaxBuilder().build();
 
-		bookKeeper = new BookKeeper(invoiceFactory);
+		// when
+		Mockito.when(invoiceFactory.create(invoiceRequest.getClientData())).
+				thenReturn(invoice);
+		Mockito.when(taxPolicy.calculateTax(requestItem.getProductData().getType(),
+				requestItem.getProductData().getPrice())).
+				thenReturn(tax);
+
+		// then
 		Invoice newInvoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
-		assertThat(newInvoice.getClient(), is(clientData));
+		assertThat(newInvoice.getClient(), is(invoiceRequest.getClientData()));
 	}
 
 	@Test
