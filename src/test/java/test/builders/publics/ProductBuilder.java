@@ -1,4 +1,4 @@
-package pl.com.bottega.ecommerce.sales.application.api.handler;
+package test.builders.publics;
 
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.Product;

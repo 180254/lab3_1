@@ -21,6 +21,8 @@ import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductRepository;
 import pl.com.bottega.ecommerce.sales.domain.reservation.Reservation;
 import pl.com.bottega.ecommerce.sales.domain.reservation.ReservationRepository;
 import pl.com.bottega.ecommerce.system.application.SystemContext;
+import test.builders.publics.ProductBuilder;
+import test.builders.publics.ReservationBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AddProductCommandHandlerTest {

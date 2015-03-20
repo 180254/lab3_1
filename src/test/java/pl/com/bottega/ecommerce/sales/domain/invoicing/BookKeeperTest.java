@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 
 import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
+import test.builders.publics.TaxBuilder;
 
 public class BookKeeperTest {
 	InvoiceFactory invoiceFactory;

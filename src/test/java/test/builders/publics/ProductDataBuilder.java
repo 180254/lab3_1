@@ -1,4 +1,4 @@
-package pl.com.bottega.ecommerce.sales.domain.invoicing;
+package test.builders.publics;
 
 import java.util.Date;
 

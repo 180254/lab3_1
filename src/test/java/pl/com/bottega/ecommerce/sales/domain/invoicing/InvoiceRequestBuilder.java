@@ -6,6 +6,7 @@ import java.util.List;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
 import pl.com.bottega.ecommerce.sales.domain.invoicing.InvoiceRequest;
 import pl.com.bottega.ecommerce.sales.domain.invoicing.RequestItem;
+import test.builders.publics.ClientDataBuilder;
 
 public class InvoiceRequestBuilder {
 	private ClientData client;
