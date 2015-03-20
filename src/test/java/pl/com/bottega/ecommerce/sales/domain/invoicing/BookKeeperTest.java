@@ -18,13 +18,8 @@ public class BookKeeperTest {
 
 	@Before
 	public void setUp() throws Exception {
-		RequestItem requestItem = new RequestItemBuilder()
-				.build();
-
-		invoiceRequest = new InvoiceRequestBuilder()
-				.addItem(requestItem)
-				.build();
-
+		invoiceRequest = new InvoiceRequestBuilder().build();
+		
 		Invoice invoice = new InvoiceBuilder()
 				.withClient(invoiceRequest.getClient())
 				.build();
@@ -42,13 +37,15 @@ public class BookKeeperTest {
 				thenReturn(invoice);
 
 		Mockito.when(taxPolicy.
-				calculateTax(requestItem.getProductData().getType(), requestItem.getProductData().getPrice())).
+				calculateTax(Mockito.any(ProductType.class), Mockito.any(Money.class))).
 				thenReturn(tax);
 	}
 
 	@Test
 	public final void testIssuance_testReult_invoiceRequestWithOneItemshoudReturnOneItem() {
 		// when
+		RequestItem requestItem = new RequestItemBuilder().build();
+		invoiceRequest.add(requestItem);
 		Invoice newInvoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
 
 		// then
@@ -58,7 +55,9 @@ public class BookKeeperTest {
 	@Test
 	public final void testIssuance_testState_invoiceWithTwoItemsShouldInvokeTaxPolicyTwice() {
 		// when
+		RequestItem firstItem = new RequestItemBuilder().build();
 		RequestItem secondItem = new RequestItemBuilder().build();
+		invoiceRequest.add(firstItem);
 		invoiceRequest.add(secondItem);
 		bookKeeper.issuance(invoiceRequest, taxPolicy);
 
@@ -71,6 +70,8 @@ public class BookKeeperTest {
 	@Test
 	public final void testIssuance_testReult_invoiceShouldContainProperClientData() {
 		// when
+		RequestItem requestItem = new RequestItemBuilder().build();
+		invoiceRequest.add(requestItem);
 		Invoice newInvoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
 
 		// then
