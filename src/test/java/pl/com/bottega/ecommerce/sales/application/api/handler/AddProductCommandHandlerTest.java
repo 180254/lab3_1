@@ -73,5 +73,21 @@ public class AddProductCommandHandlerTest {
 		Mockito.verify(reservationRepository, Mockito.times(1)).save(reservation);
 
 	}
+	
+	@Test
+	public final void testHandle_testState_reservationRipositoryLoadproperOrder() {
+		Id orderID = new Id("167");
+		Product product = new ProductBuilder().build();
+		Reservation reservation = new ReservationBuilder().build();
+		AddProductCommand addProductCommand = new AddProductCommandBuilder().withOrderId(orderID).build();
+
+		MockitoAnnotations.initMocks(addProductCommandHandler);
+		Mockito.when(reservationRepository.load(Mockito.any(Id.class))).thenReturn(reservation);
+		Mockito.when(productRepository.load(Mockito.any(Id.class))).thenReturn(product);
+		addProductCommandHandler.handle(addProductCommand);
+
+		// then
+		Mockito.verify(reservationRepository, Mockito.times(1)).load(orderID);
+	}
 
 }
