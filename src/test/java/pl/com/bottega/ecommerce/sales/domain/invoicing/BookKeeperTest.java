@@ -80,5 +80,26 @@ public class BookKeeperTest {
 		Invoice newInvoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
 		Mockito.verify(taxPolicy, Mockito.times(2)).calculateTax(Mockito.any(ProductType.class), Mockito.any(Money.class));
 	}
+	
+	@Test
+	public final void testIssuance_testState_methodFactoryFromInvoiceFactoryShouldBeInvokedOneTime() {
+		ClientData clientData = new ClientData(Id.generate(), "not important");
+		Invoice invoice = new Invoice(Id.generate(), clientData);
+		InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
+		Money price = new Money(10);
+		ProductData productData = new ProductData(Id.generate(), price, "not important", ProductType.DRUG, new Date());
+		RequestItem item = new RequestItem(productData, 0, new Money(10));
+		invoiceRequest.add(item);
+		invoiceRequest.add(item);
+
+		InvoiceFactory invoiceFactory = Mockito.mock(InvoiceFactory.class);
+		TaxPolicy taxPolicy = Mockito.mock(TaxPolicy.class);
+		Mockito.when(invoiceFactory.create(invoiceRequest.getClientData())).thenReturn(invoice);
+		Mockito.when(taxPolicy.calculateTax(ProductType.DRUG, price)).thenReturn(new Tax(new Money(1d), "not important"));
+		
+		bookKeeper = new BookKeeper(invoiceFactory);
+		Invoice newInvoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
+		Mockito.verify(invoiceFactory, Mockito.times(1)).create(clientData);
+	}
 
 }
