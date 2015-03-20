@@ -20,8 +20,9 @@ import pl.com.bottega.ecommerce.sharedkernel.Money;
 
 public class BookKeeperTest {
 
-	InvoiceFactory invoiceFactory;
 	BookKeeper bookKeeper;
+	TaxPolicy taxPolicy;
+	InvoiceFactory invoiceFactory;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -33,7 +34,10 @@ public class BookKeeperTest {
 
 	@Before
 	public void setUp() throws Exception {
+		// given, always same
+		taxPolicy = Mockito.mock(TaxPolicy.class);
 		invoiceFactory = Mockito.mock(InvoiceFactory.class);
+
 		bookKeeper = new BookKeeper(invoiceFactory);
 	}
 
@@ -51,9 +55,6 @@ public class BookKeeperTest {
 		Invoice invoice = new InvoiceBuilder().withClient(invoiceRequest.getClient()).build();
 		Tax tax = new TaxBuilder().build();
 
-		// given
-		TaxPolicy taxPolicy = Mockito.mock(TaxPolicy.class);
-
 		// when
 		Mockito.when(invoiceFactory.create(invoiceRequest.getClientData())).
 				thenReturn(invoice);
@@ -67,26 +68,31 @@ public class BookKeeperTest {
 	}
 
 	@Test
-	public final void testIssuance_testState_invoiceWithTwoItems_checkTaxPolicyInvokeCounter() {
-		ClientData clientData = new ClientData(Id.generate(), "not important");
-		Invoice invoice = new Invoice(Id.generate(), clientData);
-		InvoiceRequest invoiceRequest = new InvoiceRequest(clientData);
-		Money price = new Money(10);
-		ProductData productData = new ProductData(Id.generate(), price, "not important", ProductType.DRUG, new Date());
-		RequestItem item = new RequestItem(productData, 0, new Money(10));
-		invoiceRequest.add(item);
-		invoiceRequest.add(item);
+	public final void testIssuance_testState_invoiceWithTwoItemsShouldInvokeTaxPolicyTwice() {
+		InvoiceRequest invoiceRequest = new InvoiceRequestBuilder().build();
+		RequestItem[] requestItems = new RequestItem[2];
+		requestItems[0] = new RequestItemBuilder().build();
+		requestItems[1] = new RequestItemBuilder(requestItems[0]).build();
 
-		InvoiceFactory invoiceFactory = Mockito.mock(InvoiceFactory.class);
-		TaxPolicy taxPolicy = Mockito.mock(TaxPolicy.class);
-		Mockito.when(invoiceFactory.create(invoiceRequest.getClientData())).thenReturn(invoice);
-		Mockito.when(taxPolicy.calculateTax(ProductType.DRUG, price)).thenReturn(
-				new Tax(new Money(1d), "not important"));
+		invoiceRequest.add(requestItems[0]);
+		invoiceRequest.add(requestItems[1]);
 
+		Invoice invoice = new InvoiceBuilder().withClient(invoiceRequest.getClient()).build();
+		Tax tax = new TaxBuilder().build();
+
+		// when
+		Mockito.when(invoiceFactory.create(invoiceRequest.getClientData())).
+				thenReturn(invoice);
+		Mockito.when(taxPolicy.calculateTax(requestItems[0].getProductData().getType(),
+				requestItems[0].getProductData().getPrice())).
+				thenReturn(tax);
+
+		// then
 		bookKeeper = new BookKeeper(invoiceFactory);
-		Invoice newInvoice = bookKeeper.issuance(invoiceRequest, taxPolicy);
-		Mockito.verify(taxPolicy, Mockito.times(2)).calculateTax(Mockito.any(ProductType.class),
-				Mockito.any(Money.class));
+		bookKeeper.issuance(invoiceRequest, taxPolicy);
+		Mockito.verify(taxPolicy, Mockito.times(2)).
+				calculateTax(Mockito.any(ProductType.class),
+						Mockito.any(Money.class));
 	}
 
 	@Test
