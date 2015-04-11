@@ -27,6 +27,9 @@ import test.builders.publics.ReservationBuilder;
 @RunWith(MockitoJUnitRunner.class)
 public class AddProductCommandHandlerTest {
 
+	@InjectMocks
+	AddProductCommandHandler addProductCommandHandler;
+	
 	@Mock
 	ReservationRepository reservationRepository;
 	@Mock
@@ -37,10 +40,7 @@ public class AddProductCommandHandlerTest {
 	ClientRepository clientRepository;
 	@Mock
 	SystemContext systemContext;
-
-	@InjectMocks
-	AddProductCommandHandler addProductCommandHandler = new AddProductCommandHandler();
-
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -51,8 +51,6 @@ public class AddProductCommandHandlerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		systemContext = Mockito.mock(SystemContext.class);
-
 	}
 
 	@After
@@ -75,7 +73,7 @@ public class AddProductCommandHandlerTest {
 		Mockito.verify(reservationRepository, Mockito.times(1)).save(reservation);
 
 	}
-	
+
 	@Test
 	public final void testHandle_testState_reservationRipositoryLoadproperOrder() {
 		Id orderID = new Id("167");
