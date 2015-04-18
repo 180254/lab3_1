@@ -76,4 +76,9 @@ public class Invoice  {
 		return gros;
 	}
 
+
+	public Id getId() {
+		return id;
+	}
+
 }

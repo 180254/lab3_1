@@ -22,8 +22,6 @@ public class ClientData {
 	private Id id;
 	
 	private String name;
-
-	private ClientData(){}
 	
 	public ClientData(Id id, String name) {
 		this.id = id;

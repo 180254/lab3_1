@@ -15,4 +15,8 @@ public class DomainOperationException extends RuntimeException {
 		this.id = id;
 	}
 
+	public Id getId() {
+		return id;
+	}
+
 }
